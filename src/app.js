@@ -1,21 +1,36 @@
 const express = require('express')
-
+const {adminAuth,userAuth} = require('./middlewares/authentication')
 const app = express();
 
-app.use("/admin",(req,res,next)=>{
-    const token = '12345';
-    const userAuthorizer = token === '12345';
-    if(userAuthorizer)
-        next();
-    else
-    res.status(401).send("Unauthorized to access!!");
-})
+app.use("/admin",adminAuth)
+
 app.use("/admin/getData",(req,res)=>{
     res.send("Fetched important data successfully!!")
 })
 app.use("/admin/deleteData",(req,res)=>{
     res.send("Deleted useless data successfully!!")
 })
+
+app.use("/admin",(req,res)=>{
+    res.send("Hello you are an authorized admin")
+})
+
+app.use("/user/login",(req,res)=>{
+    res.send("User login done!")
+})
+
+
+app.use("/user/getFeed",userAuth,(req,res)=>{
+    res.send("User feeds send successfully!")
+})
+
+app.use("/user/profile",(req,res)=>{
+    res.send("User profile loaded!")
+})
+
+
+
+
 /*
 //Middlewares
 app.use("/",(req,res,next)=>{
