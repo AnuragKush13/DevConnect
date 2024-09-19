@@ -1,15 +1,26 @@
 const express = require('express')
 
 const app = express();
-app.use("/hello",(req,res)=>{
-    res.send("Hello Hello Hello")
+app.use("/",(req,res,next)=>{
+    console.log("from /");
+    // res.send("from / send")
+    next()
 })
-app.use("/test",(req,res)=>{
-    res.send("Test hello!!")
+
+app.use("/user",(req,res,next)=>{
+    console.log("inside user1")
+    // res.send("Hello user from first");
+    next();
+},
+(req,res,next)=>{
+    console.log("inside second");
+    // res.send("from 2nd route");
+    next()
+},
+(req,res,next)=>{
+    console.log("inside third");
+    res.send("from 3rd route");
 })
-app.use("/",(req,res)=>{
-    res.send("Hello World!!")
-});
 
 
 app.listen(7777,()=>{
