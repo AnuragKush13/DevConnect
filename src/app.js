@@ -3,6 +3,8 @@ const connectDB = require('./config/database')
 const User = require('./models/user')
 const {signUpValidation} = require('./utils/validation')
 const bcrypt = require('bcrypt')
+const { default: isEmail } = require('validator/lib/isEmail')
+const { default: mongoose } = require('mongoose')
 const app = express();
 
 app.use(express.json())
@@ -56,6 +58,26 @@ app.post("/signup",async (req,res)=>{
     }
     
 })
+
+
+//login api
+app.post("/login", async (req,res)=>{
+    try{
+        const {emailId,password} = req.body;
+        if(!isEmail(emailId))throw new Error("Invalid Credential!!")
+        const user = await User.findOne({emailId:emailId})
+        if(!user)throw new Error("Invalid Credential!!")
+        const validUser = await bcrypt.compare(password,user.password);
+        console.log(validUser)
+        if(!validUser)throw new Error("Invalid Credentials!!")
+        else{
+            res.status(200).send("Login Successfull!!")    }
+    }
+    catch(err){
+        res.status(400).send("ERROR : "+err.message);
+    }
+})
+
 
 //getting user based on id passed
 app.get("/userbyID",async (req,res)=>{
