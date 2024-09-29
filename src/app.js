@@ -77,7 +77,7 @@ app.post("/login", async (req,res)=>{
         if(!validUser)throw new Error("Invalid Credentials!!")
         else{
             //creating webtoken for valid logins
-            const token = jwt.sign(req.body._id, 'Devconnect@123')
+            const token = jwt.sign({_id:user._id}, 'Devconnect@123')
             res.cookie("token",token);
             res.status(200).send("Login Successfull!!")    }
     }
@@ -93,10 +93,11 @@ app.get("/profile",async (req,res)=>{
         const cookies = req.cookies;
         const {token} = cookies;
         //validating my token
-        const userId = jwt.verify(token,'Devconnect@123');
-        if(userId)
+        const decodedMessage =await jwt.verify(token,'Devconnect@123');
+        const {_id} = decodedMessage;
+        if(_id)
             {
-                const user = await User.findById({_id:userId});
+                const user = await User.findById(_id);
                 if(user)
                 res.send(user);
                 else
