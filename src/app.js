@@ -5,9 +5,12 @@ const {signUpValidation} = require('./utils/validation')
 const bcrypt = require('bcrypt')
 const { default: isEmail } = require('validator/lib/isEmail')
 const { default: mongoose } = require('mongoose')
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const app = express();
 
 app.use(express.json())
+app.use(cookieParser())
 
 //finds on the basis of firstName
 app.get("/user",async (req,res)=>{
@@ -63,6 +66,8 @@ app.post("/signup",async (req,res)=>{
 //login api
 app.post("/login", async (req,res)=>{
     try{
+       
+
         const {emailId,password} = req.body;
         if(!isEmail(emailId))throw new Error("Invalid Credential!!")
         const user = await User.findOne({emailId:emailId})
@@ -71,6 +76,9 @@ app.post("/login", async (req,res)=>{
         console.log(validUser)
         if(!validUser)throw new Error("Invalid Credentials!!")
         else{
+            //creating webtoken for valid logins
+            const token = jwt.sign(req.body._id, 'Devconnect@123')
+            res.cookie("token",token);
             res.status(200).send("Login Successfull!!")    }
     }
     catch(err){
@@ -78,6 +86,31 @@ app.post("/login", async (req,res)=>{
     }
 })
 
+
+//profile
+app.get("/profile",async (req,res)=>{
+    try{
+        const cookies = req.cookies;
+        const {token} = cookies;
+        //validating my token
+        const userId = jwt.verify(token,'Devconnect@123');
+        if(userId)
+            {
+                const user = await User.findById({_id:userId});
+                if(user)
+                res.send(user);
+                else
+                throw new Error("User not found!!")
+            }
+        else{
+            throw new Error("Not Valid!!")
+        }
+        
+    }
+    catch(err){
+        res.status(400).send("ERROR : "+err.message);
+    }
+})
 
 //getting user based on id passed
 app.get("/userbyID",async (req,res)=>{
