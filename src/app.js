@@ -1,7 +1,5 @@
 const express = require('express')
 const connectDB = require('./config/database')
-const { default: mongoose } = require('mongoose')
-const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const app = express();
 

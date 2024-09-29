@@ -1,0 +1,5 @@
+- utils folder has helper functions
+- routers have different api routes grouped for better understanding
+- models folder have different db schemas and models
+- middlewares comes in handy for apis to create functions run before actual data fetching and all
+- config have db connections 
