@@ -74,12 +74,11 @@ app.post("/login", async (req,res)=>{
         if(!isEmail(emailId))throw new Error("Invalid Credential!!")
         const user = await User.findOne({emailId:emailId})
         if(!user)throw new Error("Invalid Credential!!")
-        const validUser = await bcrypt.compare(password,user.password);
-        console.log(validUser)
+        const validUser =await  user.validatePassword(password);
         if(!validUser)throw new Error("Invalid Credentials!!")
         else{
             //creating webtoken for valid logins
-            const token = jwt.sign({_id:user._id}, 'Devconnect@123',{expiresIn:"1d"})
+            const token = await user.getJWT();
             res.cookie("token",token,{expires:new Date(Date.now() + 900000)});
             res.status(200).send("Login Successfull!!")    }
     }
