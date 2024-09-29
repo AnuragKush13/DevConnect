@@ -7,6 +7,8 @@ const { default: isEmail } = require('validator/lib/isEmail')
 const { default: mongoose } = require('mongoose')
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const {userAuth} = require('./middlewares/authentication')
+
 const app = express();
 
 app.use(express.json())
@@ -88,30 +90,29 @@ app.post("/login", async (req,res)=>{
 
 
 //profile
-app.get("/profile",async (req,res)=>{
+app.get("/profile",userAuth,async (req,res)=>{
     try{
-        const cookies = req.cookies;
-        const {token} = cookies;
-        //validating my token
-        const decodedMessage =await jwt.verify(token,'Devconnect@123');
-        const {_id} = decodedMessage;
-        if(_id)
-            {
-                const user = await User.findById(_id);
-                if(user)
-                res.send(user);
-                else
-                throw new Error("User not found!!")
-            }
-        else{
-            throw new Error("Not Valid!!")
-        }
+        const user = req.user;
+        res.status(200).send(user);
         
     }
     catch(err){
         res.status(400).send("ERROR : "+err.message);
     }
 })
+
+//send Connecion Request
+app.post("/sendConnectionRequest",userAuth, async (req,res)=>{
+    try{
+        const user = req.user;
+        res.status(200).send(user.firstName + " sent connection request!!");
+        
+    }
+    catch(err){
+        res.status(400).send("ERROR : "+err.message);
+    }
+})
+
 
 //getting user based on id passed
 app.get("/userbyID",async (req,res)=>{

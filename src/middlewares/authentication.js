@@ -1,17 +1,18 @@
-const adminAuth = (req,res,next)=>{
-    const authToken = "12345"
-    const adminAuthorized = authToken === '12345'
-    if(adminAuthorized)
-       next();
-    else
-    res.send("Not authorized to access!")
-}
-const userAuth = (req,res,next)=>{
-    const authToken = "1234ds5"
-    const userAuthorized = authToken === '12345'
-    if(userAuthorized)
+const jwt = require('jsonwebtoken')
+const User = require('../models/user')
+const userAuth = async (req,res,next)=>{
+    try{
+        const {token} = req.cookies;
+        if(!token)throw new Error("User not logged in!!")
+        const decodedObj = await jwt.verify(token,'Devconnect@123')
+        const {_id} = decodedObj;
+        const user =await  User.findById(_id);
+        if(!user)throw new Error("Invalid Token!!")
+        req.user = user;
         next();
-    else
-    res.status(401).send("User not authorized to access!")
+    }
+    catch(err){
+        res.status(401).send("ERROR::"+err.message)
+    }
 }
-module.exports ={adminAuth,userAuth}
+module.exports ={userAuth}
