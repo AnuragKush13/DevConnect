@@ -1,11 +1,17 @@
 const express = require('express');
 const requestRouter = express.Router();
 const {userAuth} = require('../middlewares/authentication');
-
-requestRouter.post("/sendConnectionRequest",userAuth, async (req,res)=>{
+const ConnectionRequest = require('../models/connectionRequest');
+requestRouter.post("/request/:status/:toUserId",userAuth, async (req,res)=>{
     try{
-        const user = req.user;
-        res.status(200).send(user.firstName + " sent connection request!!");
+        const toUserId = req.params.toUserId;
+        const fromUserId = req.user._id;
+        const status = req.params.status;
+        const connectionRequest = new ConnectionRequest({
+            toUserId,fromUserId,status
+        })
+        await connectionRequest.save();
+        res.status(200).send(req.user.firstName + " sent connection request!!");
         
     }
     catch(err){
