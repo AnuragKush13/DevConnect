@@ -14,4 +14,15 @@ const signUpValidation = (req)=>{
         throw new Error("Please enter strong password!!")
 }
 
-module.exports = {signUpValidation}
+const profileEditValidation = (req)=>{
+    const allowed_edit = ["firstName","lastName","skills","photoUrl","about","gender"];
+    const isAllowed  = Object.keys(req.body).every((key)=>allowed_edit.includes(key))
+    return isAllowed;
+}
+const passwordEditValidation= (req)=>{
+    const allowed_edit = ["password"];
+    const isAllowed  = Object.keys(req.body).every((key)=>allowed_edit.includes(key))
+    return isAllowed;
+}
+
+module.exports = {signUpValidation,profileEditValidation,passwordEditValidation}

@@ -33,7 +33,8 @@ const userSchema = new mongoose.Schema({
     about:{
         type:String,
         default:'I love DevConnect...'
-    }
+    },
+    photoUrl:{type:String}
 },{timestamps:true})
 //creating a model out of the schema defined above
 
