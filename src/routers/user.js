@@ -52,6 +52,10 @@ userRouter.get("/feed",userAuth,async (req,res)=>{
     try{
 
         const loggedInUser = req.user;
+        const page = req.query.page || 1;
+        let limit = req.query.limit || 10;
+        limit = limit > 50 ? 50 :limit;
+        const skip = (page-1) * limit;
         //remove loggedinuser
         //remove those users whose ids are present in connections table
         const connectionRequest = await ConnectionRequestModel.find({
@@ -68,7 +72,7 @@ userRouter.get("/feed",userAuth,async (req,res)=>{
 
        const feedUsers = await User.find({
         _id: {$nin: Array.from(hideUsersFromFeed)}
-       }).select(USER_SAFE_DATA)
+       }).select(USER_SAFE_DATA).skip(skip).limit(limit)
        res.send(feedUsers)
     }
     catch(err){
