@@ -4,7 +4,7 @@ const {userAuth} = require('../middlewares/authentication');
 const ConnectionRequest = require('../models/connectionRequest');
 const User = require('../models/user');
 const { connection } = require('mongoose');
-requestRouter.post("/request/:status/:toUserId",userAuth, async (req,res)=>{
+requestRouter.post("/request/send/:status/:toUserId",userAuth, async (req,res)=>{
     try{
         const toUserId = req.params.toUserId;
         const fromUserId = req.user._id;
@@ -26,6 +26,11 @@ requestRouter.post("/request/:status/:toUserId",userAuth, async (req,res)=>{
         })
         if(connectionExist){
             //updating status 
+            //checking if already status is accepted or rejected or not
+            const existingStatus = ["accepted","rejected"];
+            const isBlocked = existingStatus.includes(connectionExist.status);
+            if(isBlocked)throw new Error("Status not allowed "+status)
+                
             if(connectionExist.status != status && connectionExist.status)
             {
                 connectionExist.status = status;
@@ -50,6 +55,42 @@ requestRouter.post("/request/:status/:toUserId",userAuth, async (req,res)=>{
     }
     catch(err){
         res.status(400).send("ERROR : "+err.message);
+    }
+})
+
+requestRouter.post("/request/review/:status/:requestId",userAuth,async (req,res)=>{
+    try{
+        const loggedInUser = req.user;
+        const status = req.params.status;
+        const requestId = req.params.requestId;
+        //validating status param
+        const allowedStatus = ["accepted","rejected"];
+        if(!allowedStatus.includes(status))
+            return res.status(400).send("Status not allowed::"+status);
+         //only if current status is interested 
+        //and loggedInUser == toUserId
+        //of _id of requestId
+        const connectionRequest = await ConnectionRequest.findOne({
+            toUserId:loggedInUser._id,
+            status:"interested",
+            _id:requestId
+        });
+      
+        if(!connectionRequest)
+            return res.status(400).json({message:"No such connectuon request exists!!"})
+        //update the status of the request to either accepted or rejected 
+        connectionRequest.status = status;
+        const data = await connectionRequest.save();
+        res.status(200).json({
+            message:"Connection status updated to "+status,
+            data,
+          
+        })
+         
+
+    }
+    catch(err){
+        res.status(400).send("ERROR: "+ err.message)
     }
 })
 
