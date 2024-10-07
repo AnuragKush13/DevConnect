@@ -35,7 +35,7 @@ authRouter.post("/login", async (req,res)=>{
             //creating webtoken for valid logins
             const token = await user.getJWT();
             res.cookie("token",token,{expires:new Date(Date.now() + 900000)});
-            res.status(200).json({message:"Login Successfull!!",data:user})    }
+            res.status(200).json({message:"Login Successfull!!",user})    }
     }
     catch(err){
         res.status(400).send("ERROR : "+err.message);

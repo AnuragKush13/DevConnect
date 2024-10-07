@@ -19,6 +19,22 @@ userRouter.get("/user/requests/received",userAuth,async (req,res)=>{
         res.status(400).send("ERROR:: "+err.message);
     }
 })
+//not tested yet
+userRouter.get("/user/requests/ignored",userAuth,async (req,res)=>{
+    try{
+        const loggedInUser = req.user;
+        //status == interested
+        //touserId = loggedInUserId
+        const connectionRequest = await ConnectionRequestModel.find({
+            status :"ignored",
+            fromUserId:loggedInUser._id
+        }).populate("fromUserId",USER_SAFE_DATA)
+        res.send(connectionRequest)
+    }
+    catch(err){
+        res.status(400).send("ERROR:: "+err.message);
+    }
+})
 
 userRouter.get("/user/connections",userAuth,async(req,res)=>{
     try{
