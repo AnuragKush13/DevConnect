@@ -3,6 +3,7 @@ const User = require('../models/user')
 const userAuth = async (req,res,next)=>{
     try{
         const {token} = req.cookies;
+        console.log("token::"+token)
         if(!token)return res.status(401).send("User not logged in!!")
         const decodedObj = await jwt.verify(token,'Devconnect@123')
         const {_id} = decodedObj;
