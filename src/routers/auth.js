@@ -53,7 +53,6 @@ authRouter.post("/logout",async (req,res)=>{
         res.clearCookie("token", {
             path: '/',
             secure: true, // if you set it as secure
-            sameSite: 'Strict' // or 'Lax', depending on your needs
           });
         res.status(200).send("User Logged out successfully!!")
 
